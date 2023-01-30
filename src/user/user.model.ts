@@ -13,7 +13,5 @@ export class User {
   username: string;
 }
 
-export interface UserCreate extends Omit<User, '_id'> {}
-
 export type UserDocument = User & mongoose.Document;
 export const UserSchema = SchemaFactory.createForClass(User);

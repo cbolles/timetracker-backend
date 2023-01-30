@@ -3,7 +3,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { join } from 'path';
-import {MongooseModule} from '@nestjs/mongoose';
+import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import {MongooseModule} from '@nestjs/mongoose';
     }),
     MongooseModule.forRoot('mongodb://localhost/damplab'),
     UserModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],
