@@ -11,4 +11,12 @@ export class UserService {
   create(userCreate: UserCreate): Promise<User> {
     return this.userModel.create(userCreate);
   }
+
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userModel.findOne({ username: username });
+  }
+
+  async userExists(username: string): Promise<boolean> {
+    return (await this.findByUsername(username)) !== null;
+  }
 }
