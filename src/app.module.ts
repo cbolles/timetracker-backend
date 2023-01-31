@@ -17,7 +17,7 @@ import configuration from './config/configuration';
     ConfigModule.forRoot({
       load: [configuration]
     }),
-    MongooseModule.forRoot('mongodb://localhost/damplab'),
+    MongooseModule.forRoot('mongodb://localhost/timetracker'),
     UserModule,
     AuthModule
   ],
