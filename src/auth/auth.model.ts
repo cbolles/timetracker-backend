@@ -1,4 +1,4 @@
-import { Schema, Prop } from '@nestjs/mongoose';
+import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { User } from 'src/user/user.model';
 
@@ -10,3 +10,6 @@ export class Credentials {
   @Prop()
   password: string;
 }
+
+export type CredentialsDocument = Credentials & mongoose.Document;
+export const CredentialsSchema = SchemaFactory.createForClass(Credentials);
