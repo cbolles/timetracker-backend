@@ -6,8 +6,7 @@ import { Project } from './project.model';
 import { ProjectService } from './project.service';
 import { UserContext } from '../auth/user.decorator';
 import { User } from '../user/user.model';
-import {UserService} from 'src/user/user.service';
-
+import { UserService } from '../user/user.service';
 
 @Resolver(() => Project)
 export class ProjectResolver {

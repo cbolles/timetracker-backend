@@ -20,3 +20,27 @@ export class Project {
 
 export type ProjectDocument = Project & mongoose.Document;
 export const ProjectSchema = SchemaFactory.createForClass(Project);
+
+
+@Schema({
+  timeseries: {
+    timeField: 'started',
+    granularity: 'minutes'
+  }
+})
+export class ProjectActiveTime {
+  /** The project the time recording is for */
+  @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: Project.name })
+  project: mongoose.Types.ObjectId
+
+  /** The time the project was started to be worked on */
+  @Prop()
+  started: Date;
+
+  /** The time the project was no longer being worked on */
+  @Prop()
+  stopped?: Date;
+}
+
+export type ProjectActiveTimeDocument = ProjectActiveTime & Document;
+export const ProjectActiveTimeSchema = SchemaFactory.createForClass(ProjectActiveTime);

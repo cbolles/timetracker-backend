@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { Project } from './project.model';
+import { Project, ProjectActiveTime } from './project.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../user/user.model';
 import { ProjectCreate } from './project.dto';
@@ -21,5 +21,17 @@ export class ProjectService {
   async findAllForUser(user: User): Promise<Project[]> {
     return this.projectModel.find({ user: user._id });
   }
+}
 
+@Injectable()
+export class ProjectActiveTimeService {
+  constructor(@InjectModel(ProjectActiveTime.name) private readonly projectTimeModel: Model<ProjectActiveTime>) {}
+
+  /**
+   * Make the provided project the active project and (if there is another
+   * active project) set it as no longer active
+   */
+  async setActive(project: Project): Promise<void> {
+    // const currentActive = await this.projectTimeModel.findOne({
+  }
 }

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { Project, ProjectSchema } from './project.model';
+import { Project, ProjectActiveTime, ProjectActiveTimeSchema, ProjectSchema } from './project.model';
 import { ProjectResolver } from './project.resolver';
 import { ProjectService } from './project.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -11,7 +11,10 @@ import { UserModule } from '../user/user.module';
   imports: [
     AuthModule,
     UserModule,
-    MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }])
+    MongooseModule.forFeature([
+      { name: Project.name, schema: ProjectSchema },
+      { name: ProjectActiveTime.name, schema: ProjectActiveTimeSchema }
+    ])
   ]
 })
 export class ProjectModule {}
