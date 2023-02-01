@@ -18,4 +18,8 @@ export class ProjectService {
     return this.projectModel.findOne({ user: user._id, name: name });
   }
 
+  async findAllForUser(user: User): Promise<Project[]> {
+    return this.projectModel.find({ user: user._id });
+  }
+
 }
