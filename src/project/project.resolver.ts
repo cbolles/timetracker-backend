@@ -1,16 +1,18 @@
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Mutation, Args, Query, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query, ResolveField, Parent, ID } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/jwt.guard';
-import { ProjectCreate, ProjectCreatePipe } from './project.dto';
+import { ProjectCreate, ProjectCreatePipe, ProjectPipe } from './project.dto';
 import { Project } from './project.model';
-import { ProjectService } from './project.service';
+import { ActiveProjectService, ProjectService } from './project.service';
 import { UserContext } from '../auth/user.decorator';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
 
 @Resolver(() => Project)
 export class ProjectResolver {
-  constructor(private readonly projectService: ProjectService, private readonly userService: UserService) {}
+  constructor(private readonly projectService: ProjectService,
+              private readonly userService: UserService,
+              private readonly activeProjectService: ActiveProjectService) {}
 
   @Mutation(() => Project)
   @UseGuards(JwtAuthGuard)
@@ -24,6 +26,13 @@ export class ProjectResolver {
   @UseGuards(JwtAuthGuard)
   async getProjects(@UserContext() user: User): Promise<Project[]> {
     return this.projectService.findAllForUser(user);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(JwtAuthGuard)
+  async setActiveProject(@Args('project', { type: () => ID }, ProjectPipe) project: Project): Promise<boolean> {
+    await this.activeProjectService.setActive(project);
+    return true;
   }
 
   @ResolveField()

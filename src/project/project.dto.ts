@@ -3,6 +3,7 @@ import { CONTEXT, InputType, OmitType } from '@nestjs/graphql';
 import { User } from '../user/user.model';
 import { Project } from './project.model';
 import { ProjectService } from './project.service';
+import mongoose from 'mongoose';
 
 @InputType({ description: 'Information required to make a new project' })
 export class ProjectCreate extends OmitType(Project, ['_id', 'user'] as const, InputType) {}
@@ -22,5 +23,22 @@ export class ProjectCreatePipe implements PipeTransform {
     }
 
     return value;
+  }
+}
+
+/** Convert an ID to a project */
+@Injectable()
+export class ProjectPipe implements PipeTransform<string, Promise<Project>> {
+  constructor(private readonly projectService: ProjectService) {}
+
+  async transform(value: string): Promise<Project> {
+    try {
+      const project = await this.projectService.findByID(new mongoose.Types.ObjectId(value));
+      if (project) {
+        return project;
+      }
+    } catch(e) {}
+
+    throw new BadRequestException(`No project exists with the ID: ${value}`);
   }
 }
