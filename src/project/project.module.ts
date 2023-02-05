@@ -7,14 +7,20 @@ import {
   ProjectActiveTimeSchema,
   ProjectSchema
 } from './project.model';
-import { ProjectResolver } from './project.resolver';
+import { ProjectActiveTimeResolver, ProjectResolver } from './project.resolver';
 import { ProjectService, ProjectActiveTimeService, ActiveProjectService } from './project.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  providers: [ProjectService, ProjectResolver, ProjectActiveTimeService, ActiveProjectService],
+  providers: [
+    ProjectService,
+    ProjectResolver,
+    ProjectActiveTimeService,
+    ActiveProjectService,
+    ProjectActiveTimeResolver
+  ],
   imports: [
     AuthModule,
     UserModule,

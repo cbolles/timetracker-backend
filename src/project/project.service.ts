@@ -69,7 +69,7 @@ export class ProjectActiveTimeService {
     return await this.projectTimeModel.aggregate([
       { $match: { "user": user._id, "day": { $gte: start, $lte: end } } },
       { $group: { _id: "$project", time: { $sum: "$time" } } },
-      { $project: { "project": "$_id", "time": "time" } }
+      { $project: { "project": "$_id", "time": "$time" } }
     ]).exec();
   }
 

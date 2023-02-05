@@ -7,6 +7,7 @@ import { ActiveProjectService, ProjectService, ProjectActiveTimeService } from '
 import { UserContext } from '../auth/user.decorator';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
+import { UserPipe } from '../user/user.pipe';
 
 @Resolver(() => Project)
 export class ProjectResolver {
@@ -48,13 +49,22 @@ export class ProjectResolver {
 /** Resolver for information on how long a project has been worked on */
 @Resolver(() => ProjectTime)
 export class ProjectActiveTimeResolver {
-  constructor(private readonly activeTimeService: ProjectActiveTimeService) {}
+  constructor(private readonly activeTimeService: ProjectActiveTimeService,
+              private readonly projectService: ProjectService) {}
 
   @Query(() => [ProjectTime])
-  async getProjectTimeForUser(@Args('user') user: User,
-                              @Args('start', { type: () => Date }) start: Date,
-                              @Args('end', { type: () => Date }) end: Date): Promise<ProjectTime[]> {
-
+  async getProjectTimeForUser(@Args('user', { type: () => ID }, UserPipe) user: User,
+                              @Args('start') start: Date,
+                              @Args('end') end: Date): Promise<ProjectTime[]> {
     return this.activeTimeService.getProjectTimeForUser(user, start, end);
+  }
+
+  @ResolveField(() => Project)
+  async project(@Parent() projectTime: ProjectTime): Promise<Project> {
+    const project = await this.projectService.findByID(projectTime.project);
+    if (project === null) {
+      throw new Error(`No valid project found for ID: ${projectTime.project}`);
+    }
+    return project;
   }
 }
