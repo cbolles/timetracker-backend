@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable, PipeTransform, Scope} from '@nestjs/common';
-import { CONTEXT, InputType, OmitType } from '@nestjs/graphql';
+import { CONTEXT, InputType, ObjectType, OmitType, Field } from '@nestjs/graphql';
 import { User } from '../user/user.model';
 import { Project } from './project.model';
 import { ProjectService } from './project.service';
@@ -41,4 +41,17 @@ export class ProjectPipe implements PipeTransform<string, Promise<Project>> {
 
     throw new BadRequestException(`No project exists with the ID: ${value}`);
   }
+}
+
+/**
+ * Represents info on how much time was spent on a project over a specific
+ * time.
+ */
+@ObjectType()
+export class ProjectTime {
+  @Field(() => Project)
+  project: mongoose.Types.ObjectId;
+
+  @Field({ description: 'The time spent on the project over the specific time period '})
+  time: number;
 }

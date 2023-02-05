@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 import { ActiveProject, Project, ProjectActiveTime } from './project.model';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../user/user.model';
-import { ProjectCreate } from './project.dto';
+import { ProjectCreate, ProjectTime } from './project.dto';
 import mongoose from 'mongoose';
 
 @Injectable()
@@ -28,6 +28,7 @@ export class ProjectService {
   }
 }
 
+/** Handles update the acummulated time data for a project */
 @Injectable()
 export class ProjectActiveTimeService {
   constructor(@InjectModel(ProjectActiveTime.name) private readonly projectTimeModel: Model<ProjectActiveTime>) {}
@@ -59,6 +60,19 @@ export class ProjectActiveTimeService {
     });
   }
 
+  /** Get the amount of time spent on all projects for a given user */
+  async getProjectTimeForUser(user: User, start: Date, end: Date): Promise<ProjectTime[]> {
+    // Get the sum of the project times for the given time period
+    // 1. Get project time for the given user in the given time period
+    // 2. Sum based on the total time spent
+    // 3. Rename the fields to match ProjectTime[]
+    return await this.projectTimeModel.aggregate([
+      { $match: { "user": user._id, "day": { $gte: start, $lte: end } } },
+      { $group: { _id: "$project", time: { $sum: "$time" } } },
+      { $project: { "project": "$_id", "time": "time" } }
+    ]).exec();
+  }
+
   private getCurrentDay(): Date {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
@@ -66,6 +80,7 @@ export class ProjectActiveTimeService {
   }
 }
 
+/** Handle setting which project the user is actively working on */
 @Injectable()
 export class ActiveProjectService {
   constructor(@InjectModel(ActiveProject.name) private readonly activeProjectModel: Model<ActiveProject>,

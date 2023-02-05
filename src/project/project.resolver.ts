@@ -1,9 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Mutation, Args, Query, ResolveField, Parent, ID } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/jwt.guard';
-import { ProjectCreate, ProjectCreatePipe, ProjectPipe } from './project.dto';
+import { ProjectCreate, ProjectCreatePipe, ProjectPipe, ProjectTime } from './project.dto';
 import { Project } from './project.model';
-import { ActiveProjectService, ProjectService } from './project.service';
+import { ActiveProjectService, ProjectService, ProjectActiveTimeService } from './project.service';
 import { UserContext } from '../auth/user.decorator';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
@@ -42,5 +42,19 @@ export class ProjectResolver {
       throw new Error(`No valid user found on project ${project._id}`);
     }
     return user;
+  }
+}
+
+/** Resolver for information on how long a project has been worked on */
+@Resolver(() => ProjectTime)
+export class ProjectActiveTimeResolver {
+  constructor(private readonly activeTimeService: ProjectActiveTimeService) {}
+
+  @Query(() => [ProjectTime])
+  async getProjectTimeForUser(@Args('user') user: User,
+                              @Args('start', { type: () => Date }) start: Date,
+                              @Args('end', { type: () => Date }) end: Date): Promise<ProjectTime[]> {
+
+    return this.activeTimeService.getProjectTimeForUser(user, start, end);
   }
 }
