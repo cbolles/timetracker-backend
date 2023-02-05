@@ -7,7 +7,7 @@ import {
   ProjectActiveTimeSchema,
   ProjectSchema
 } from './project.model';
-import { ProjectActiveTimeResolver, ProjectResolver } from './project.resolver';
+import { ProjectActiveTimeResolver, ProjectResolver, ActiveProjectResolver } from './project.resolver';
 import { ProjectService, ProjectActiveTimeService, ActiveProjectService } from './project.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../auth/auth.module';
@@ -19,7 +19,8 @@ import { UserModule } from '../user/user.module';
     ProjectResolver,
     ProjectActiveTimeService,
     ActiveProjectService,
-    ProjectActiveTimeResolver
+    ProjectActiveTimeResolver,
+    ActiveProjectResolver
   ],
   imports: [
     AuthModule,

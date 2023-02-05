@@ -2,18 +2,17 @@ import { UseGuards } from '@nestjs/common';
 import { Resolver, Mutation, Args, Query, ResolveField, Parent, ID } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { ProjectCreate, ProjectCreatePipe, ProjectPipe, ProjectTime } from './project.dto';
-import { Project } from './project.model';
+import { ActiveProject, Project } from './project.model';
 import { ActiveProjectService, ProjectService, ProjectActiveTimeService } from './project.service';
 import { UserContext } from '../auth/user.decorator';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
-import { UserPipe } from '../user/user.pipe';
+import mongoose from 'mongoose';
 
 @Resolver(() => Project)
 export class ProjectResolver {
   constructor(private readonly projectService: ProjectService,
-              private readonly userService: UserService,
-              private readonly activeProjectService: ActiveProjectService) {}
+              private readonly userService: UserService) {}
 
   @Mutation(() => Project)
   @UseGuards(JwtAuthGuard)
@@ -29,12 +28,6 @@ export class ProjectResolver {
     return this.projectService.findAllForUser(user);
   }
 
-  @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
-  async setActiveProject(@Args('project', { type: () => ID }, ProjectPipe) project: Project): Promise<boolean> {
-    await this.activeProjectService.setActive(project);
-    return true;
-  }
 
   @ResolveField()
   async user(@Parent() project: Project): Promise<User> {
@@ -53,7 +46,8 @@ export class ProjectActiveTimeResolver {
               private readonly projectService: ProjectService) {}
 
   @Query(() => [ProjectTime])
-  async getProjectTimeForUser(@Args('user', { type: () => ID }, UserPipe) user: User,
+  @UseGuards(JwtAuthGuard)
+  async getProjectTimeForUser(@UserContext() user: User,
                               @Args('start') start: Date,
                               @Args('end') end: Date): Promise<ProjectTime[]> {
     return this.activeTimeService.getProjectTimeForUser(user, start, end);
@@ -66,5 +60,44 @@ export class ProjectActiveTimeResolver {
       throw new Error(`No valid project found for ID: ${projectTime.project}`);
     }
     return project;
+  }
+}
+
+/** Resolver for what project the user is actively working on */
+@Resolver(() => ActiveProject)
+export class ActiveProjectResolver {
+  constructor(private readonly activeProjectService: ActiveProjectService,
+              private readonly projectService: ProjectService,
+              private readonly userService: UserService) {}
+
+  @Query(() => ActiveProject, { nullable: true })
+  @UseGuards(JwtAuthGuard)
+  async getActiveProject(@UserContext() user: User): Promise<ActiveProject | null> {
+    return this.activeProjectService.getActiveProject(new mongoose.Types.ObjectId(user._id));
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(JwtAuthGuard)
+  async setActiveProject(@Args('project', { type: () => ID }, ProjectPipe) project: Project): Promise<boolean> {
+    await this.activeProjectService.setActive(project);
+    return true;
+  }
+
+  @ResolveField(() => Project)
+  async project(@Parent() activeProject: ActiveProject): Promise<Project> {
+    const project = await this.projectService.findByID(activeProject.project);
+    if (project === null) {
+      throw new Error(`No valid project found for ID: ${activeProject.project}`);
+    }
+    return project;
+  }
+
+  @ResolveField(() => User)
+  async user(@Parent() activeProject: ActiveProject): Promise<User> {
+    const user = await this.userService.findByID(activeProject.user);
+    if (user === null) {
+      throw new Error(`No valid user found for ID: ${activeProject.user}`);
+    }
+    return user;
   }
 }

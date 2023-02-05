@@ -47,19 +47,23 @@ export const ProjectActiveTimeSchema = SchemaFactory.createForClass(ProjectActiv
 
 /** Represents the project the user is currently working on */
 @Schema()
+@ObjectType()
 export class ActiveProject {
   _id: string;
 
   /** The project that is active */
   @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: Project.name })
+  @Field(() => Project)
   project: mongoose.Types.ObjectId;
 
   /** The user who's active project this is (for easy querying) */
   @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: User.name })
+  @Field(() => User)
   user: mongoose.Types.ObjectId;
 
   /** The timestamp when the project became active */
   @Prop()
+  @Field()
   activeStart: Date;
 }
 
