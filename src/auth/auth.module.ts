@@ -6,9 +6,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Credentials, CredentialsSchema } from './auth.model';
+import { JwtStrategy } from './jwt.strategy';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Module({
-  providers: [AuthService, AuthResolver],
+  providers: [AuthService, AuthResolver, JwtStrategy, JwtAuthGuard],
   imports: [
     UserModule,
     ConfigModule,

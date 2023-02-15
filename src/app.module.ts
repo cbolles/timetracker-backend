@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import configuration from './config/configuration';
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import configuration from './config/configuration';
     }),
     MongooseModule.forRoot('mongodb://localhost/timetracker'),
     UserModule,
-    AuthModule
+    AuthModule,
+    ProjectModule
   ],
   controllers: [],
   providers: [],
